@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>OpenAI Text Generator</title>
+ </head>
+ <body>
+   <h1>OpenAI Text Generator</h1>
+   <form action="/generate-text" method="GET">
+     <label for="prompt">Enter a prompt:</label>
+     <input type="text" id="prompt" name="prompt"><br><br>
+     <button type="submit">Generate Text</button>
+   </form>
+   <div id="output" style="white-space: pre-line"></div>
+   <script>
+     const form = document.querySelector('form');
+     const output = document.querySelector('#output');
+     output.innerText = "";
+     form.addEventListener('submit', async (event) => {
+       event.preventDefault();
+       output.innerText = "";
+       const formData = new FormData(form);
+       const response = await fetch(`/generate-text?prompt=${formData.get('prompt')}`);
+       
+       // Read the response as a stream of data
+       const reader = response.body.getReader();
+       const decoder = new TextDecoder("utf-8");
+       while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+         break;
+        }
+        output.innerText += decoder.decode(value);
+        console.log(output.innerText);
+       }
+     });
+   </script>
+ </body>
+</html>
